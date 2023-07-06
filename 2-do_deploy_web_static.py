@@ -3,7 +3,7 @@
 a Fabric script that distributes an archive to your web servers,
 using the function do_deploy:
 """
-import os.path
+import os
 from datetime import datetime
 from fabric.api import env, local, put, run, runs_once
 
@@ -16,14 +16,14 @@ def do_pack():
     """Create a tar gzipped archive of the directory web_static."""
     if not os.path.isdir("versions"):
         os.mkdir("versions")
-    date_time = datetime.now()
+    dt = datetime.now()
     file = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-        date_time.year,
-        date_time.month,
-        date_time.day,
-        date_time.hour,
-        date_time.minute,
-        date_time.second
+        dt.year,
+        dt.month,
+        dt.day,
+        dt.hour,
+        dt.minute,
+        dt.second
     )
     try:
         print("Packing web_static to {}".format(file))
