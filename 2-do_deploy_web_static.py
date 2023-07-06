@@ -12,26 +12,26 @@ env.hosts = ["34.234.204.250", "54.197.49.59"]
 
 @runs_once
 def do_pack():
-    """Archives the static files."""
+    """Create a tar gzipped archive of the directory web_static."""
     if not os.path.isdir("versions"):
         os.mkdir("versions")
-    cur_time = datetime.now()
-    output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-        cur_time.year,
-        cur_time.month,
-        cur_time.day,
-        cur_time.hour,
-        cur_time.minute,
-        cur_time.second
+    dt = datetime.now()
+    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(
+        dt.year,
+        dt.month,
+        dt.day,
+        dt.hour,
+        dt.minute,
+        dt.second
     )
     try:
-        print("Packing web_static to {}".format(output))
-        local("tar -cvzf {} web_static".format(output))
-        archize_size = os.stat(output).st_size
-        print("web_static packed: {} -> {} Bytes".format(output, archize_size))
+        print("Packing web_static to {}".format(file))
+        local("tar -cvzf {} web_static".format(file))
+        archize_size = os.stat(file).st_size
+        print("web_static packed: {} -> {} Bytes".format(file, archize_size))
     except Exception:
-        output = None
-    return output
+        file = None
+    return file
 
 
 def do_deploy(archive_path):
@@ -59,3 +59,9 @@ def do_deploy(archive_path):
     except Exception:
         success = False
     return success
+
+def deploy():
+    """Archives and deploys the static files to the host servers.
+    """
+    archive_path = do_pack()
+    return do_deploy(archive_path) if archive_path else False
