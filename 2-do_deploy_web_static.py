@@ -7,41 +7,37 @@ import os
 from datetime import datetime
 from fabric.api import env, local, put, run, runs_once
 
-
 env.hosts = ["34.234.204.250", "54.197.49.59"]
 
 
 @runs_once
 def do_pack():
-    """Create a tar gzipped archive of the directory web_static."""
+    """Archives the static files."""
     if not os.path.isdir("versions"):
         os.mkdir("versions")
-    dt = datetime.now()
-    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-        dt.year,
-        dt.month,
-        dt.day,
-        dt.hour,
-        dt.minute,
-        dt.second
+    cur_time = datetime.now()
+    output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
+        cur_time.year,
+        cur_time.month,
+        cur_time.day,
+        cur_time.hour,
+        cur_time.minute,
+        cur_time.second
     )
     try:
-        print("Packing web_static to {}".format(file))
-        local("tar -cvzf {} web_static".format(file))
-        archize_size = os.stat(file).st_size
-        print("web_static packed: {} -> {} Bytes".format(file, archize_size))
+        print("Packing web_static to {}".format(output))
+        local("tar -cvzf {} web_static".format(output))
+        archize_size = os.stat(output).st_size
+        print("web_static packed: {} -> {} Bytes".format(output, archize_size))
     except Exception:
-        file = None
-    return file
+        output = None
+    return output
 
 
 def do_deploy(archive_path):
-    """Distributes an archive to a web server.
+    """Deploys the static files to the host servers.
     Args:
-        archive_path (str): The path of the archive to distribute.
-    Returns:
-        If the file doesn't exist at archive_path or an error occurs - False.
-        Otherwise - True.
+        archive_path (str): The path to the archived static files.
     """
     if not os.path.exists(archive_path):
         return False
