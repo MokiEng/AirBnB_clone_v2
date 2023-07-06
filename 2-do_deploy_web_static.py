@@ -3,36 +3,11 @@
 a Fabric script that distributes an archive to your web servers,
 using the function do_deploy:
 """
-import os
+from os.path import exists
 from datetime import datetime
-from fabric.api import env, local, put, run, runs_once
-
+from fabric.api import env, local, put, run, 
 
 env.hosts = ["34.234.204.250", "54.197.49.59"]
-
-
-@runs_once
-def do_pack():
-    """Create a tar gzipped archive of the directory web_static."""
-    if not os.path.isdir("versions"):
-        os.mkdir("versions")
-    dt = datetime.now()
-    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-        dt.year,
-        dt.month,
-        dt.day,
-        dt.hour,
-        dt.minute,
-        dt.second
-    )
-    try:
-        print("Packing web_static to {}".format(file))
-        local("tar -cvzf {} web_static".format(file))
-        archize_size = os.stat(file).st_size
-        print("web_static packed: {} -> {} Bytes".format(file, archize_size))
-    except Exception:
-        file = None
-    return file
 
 
 def do_deploy(archive_path):
@@ -43,23 +18,41 @@ def do_deploy(archive_path):
         If the file doesn't exist at archive_path or an error occurs - False.
         Otherwise - True.
     """
-    if not os.path.exists(archive_path):
+     if not exists(archive_path):
         return False
-    file_name = os.path.basename(archive_path)
-    folder_name = file_name.replace(".tgz", "")
-    folder_path = "/data/web_static/releases/{}/".format(folder_name)
-    success = False
+
     try:
-        put(archive_path, "/tmp/{}".format(file_name))
-        run("mkdir -p {}".format(folder_path))
-        run("tar -xzf /tmp/{} -C {}".format(file_name, folder_path))
-        run("rm -rf /tmp/{}".format(file_name))
-        run("mv {}web_static/* {}".format(folder_path, folder_path))
-        run("rm -rf {}web_static".format(folder_path))
-        run("rm -rf /data/web_static/current")
-        run("ln -s {} /data/web_static/current".format(folder_path))
-        print('New version deployed!')
-        success = True
-    except Exception:
-        success = False
-    return success
+        # Upload the archive to the /tmp/ directory on the web server
+        put(archive_path, '/tmp/')
+
+        # Get the filename without extension
+        filename = archive_path.split('/')[-1]
+        folder_name = filename.split('.')[0]
+
+        # Create the release folder
+        run('mkdir -p /data/web_static/releases/{}/'.format(folder_name))
+
+        # Uncompress the archive to the release folder
+        run('tar -xzf /tmp/{} -C /data/web_static/releases/{}/'.format(filename, folder_name))
+
+        # Delete the archive from the web server
+        run('rm /tmp/{}'.format(filename))
+
+        # Move the contents of the release folder to the parent folder
+        run('mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/'.format(folder_name, folder_name))
+
+        # Remove the now empty web_static folder
+        run('rm -rf /data/web_static/releases/{}/web_static'.format(folder_name))
+
+        # Delete the symbolic link /data/web_static/current
+        run('rm -rf /data/web_static/current')
+
+        # Create a new symbolic link /data/web_static/current
+        run('ln -s /data/web_static/releases/{}/ /data/web_static/current'.format(folder_name))
+
+        print("New version deployed!")
+        return True
+
+    except Exception as e:
+        print("Deployment failed:", str(e))
+        return False
