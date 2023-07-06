@@ -18,7 +18,7 @@ def do_deploy(archive_path):
         If the file doesn't exist at archive_path or an error occurs - False.
         Otherwise - True.
     """
-     if not exists(archive_path):
+    if not exists(archive_path):
         return False
 
     try:
@@ -33,13 +33,15 @@ def do_deploy(archive_path):
         run('mkdir -p /data/web_static/releases/{}/'.format(folder_name))
 
         # Uncompress the archive to the release folder
-        run('tar -xzf /tmp/{} -C /data/web_static/releases/{}/'.format(filename, folder_name))
+        run('tar -xzf /tmp/{} -C /data/web_static/releases/{}/'.format(
+            filename, folder_name))
 
         # Delete the archive from the web server
         run('rm /tmp/{}'.format(filename))
 
         # Move the contents of the release folder to the parent folder
-        run('mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/'.format(folder_name, folder_name))
+        run('mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/'.format(
+            folder_name, folder_name))
 
         # Remove the now empty web_static folder
         run('rm -rf /data/web_static/releases/{}/web_static'.format(folder_name))
@@ -48,7 +50,8 @@ def do_deploy(archive_path):
         run('rm -rf /data/web_static/current')
 
         # Create a new symbolic link /data/web_static/current
-        run('ln -s /data/web_static/releases/{}/ /data/web_static/current'.format(folder_name))
+        run('ln -s /data/web_static/releases/{}/ /data/web_static/current'.format(
+            folder_name))
 
         print("New version deployed!")
         return True
