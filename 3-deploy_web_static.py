@@ -3,7 +3,7 @@
 a Fabric script that distributes an archive to your web servers,
 using the function do_deploy:
 """
-import os.path
+import os
 from datetime import datetime
 from fabric.api import env, local, put, run, runs_once
 
