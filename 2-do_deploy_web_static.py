@@ -3,6 +3,7 @@
 a Fabric script that distributes an archive to your web servers,
 using the function do_deploy:
 """
+
 import os
 from datetime import datetime
 from fabric.api import env, local, put, run, runs_once
@@ -35,9 +36,9 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-    """Deploys the static files to the host servers.
+    """Distributes an archive to a web server.
     Args:
-        archive_path (str): The path to the archived static files.
+        archive_path (str): The path of the archive to distribute..
     """
     if not os.path.exists(archive_path):
         return False
