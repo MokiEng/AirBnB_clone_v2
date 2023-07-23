@@ -25,13 +25,12 @@ def hbnb():
 
 
 @app.route('/c/<text>', strict_slashes=False)
-def c_with_text(text):
+def c(text):
     """
     Replace underscores with spaces in the text variable
-    display “C ”, followed by the value of the text variable.
     """
-    text = escape(text.replace('_', ' '))
-    return f'C {text}'
+    text = text.replace("_", " ")
+    return "C {}".format(text)
 
 
 @app.route("/python", strict_slashes=False)
