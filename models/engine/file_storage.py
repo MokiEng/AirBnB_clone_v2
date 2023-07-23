@@ -66,7 +66,8 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """ Deletes the specified object from __objects if it exists.
+        """ 
+        Deletes the specified object from __objects if it exists.
         If obj is None, the method does nothin
         """
 
@@ -75,6 +76,5 @@ class FileStorage:
             self.__objects.pop(key, None)
 
     def close(self):
-        """ calls reload()
-        """
+        """ calls reload()."""
         self.reload()
